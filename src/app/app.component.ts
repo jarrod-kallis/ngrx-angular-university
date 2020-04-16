@@ -8,6 +8,8 @@ import { AppState } from './reducers';
 import { AuthState } from './auth/reducers';
 import { isLoggedIn } from './auth/auth.selectors';
 import { logout } from './auth/auth.actions';
+import { USER } from './common/types';
+import AuthActions from './auth/auth.action-types';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +28,10 @@ export class AppComponent implements OnInit {
     console.log('App Init');
 
     this.isLoggedIn$ = this.store.select(isLoggedIn);
+
+    if (localStorage.getItem(USER)) {
+      this.store.dispatch(AuthActions.login({ user: JSON.parse(localStorage.getItem(USER)) }));
+    }
 
     this.router.events.subscribe(event => {
       switch (true) {
