@@ -51,7 +51,11 @@ const routes: Routes = [
     AuthModule.forRoot(),
     StoreModule.forRoot(reducers, { metaReducers }),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
-    EffectsModule.forRoot([])
+    EffectsModule.forRoot([]),
+    StoreRouterConnectingModule.forRoot({
+      stateKey: 'router', // Redux store key used to store the router state
+      routerState: RouterState.Minimal // Serializable version of the router state
+    })
   ],
   bootstrap: [AppComponent]
 })

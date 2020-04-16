@@ -86,3 +86,10 @@ Install Redux Store: `ng add @ngrx/store`<br/>
 Install Redux Dev Tools: `ng add @ngrx/store-devtools`<br/>
 
 Generate the store configuration (eg. default reducer) for a specific module: `ng g store auth/Auth --module auth.module.ts` <br/>
+
+Replay the Redux actions in Chrome: `@ngrx/router-store`<br/>
+
+    StoreRouterConnectingModule.forRoot({
+      stateKey: 'router', // Redux store key used to store the router state
+      routerState: RouterState.Minimal // Serializable version of the router state
+    })
