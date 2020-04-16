@@ -93,3 +93,13 @@ Replay the Redux actions in Chrome: `@ngrx/router-store`<br/>
       stateKey: 'router', // Redux store key used to store the router state
       routerState: RouterState.Minimal // Serializable version of the router state
     })
+
+Prevent mutation of Redux store:
+
+    StoreModule.forRoot(reducers, {
+      metaReducers,
+      runtimeChecks: {
+        strictActionImmutability: true, // Not allowed to mutate an action
+        strictStateImmutability: true // Not allowed to mutate the state
+      }
+    })
