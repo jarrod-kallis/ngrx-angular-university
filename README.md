@@ -103,3 +103,11 @@ Prevent mutation of Redux store:
         strictStateImmutability: true // Not allowed to mutate the state
       }
     })
+
+Meta Reducers:
+
+1. Plain reducer. Takes the current state and an action.
+2. It is processed before the normal reducers.
+3. They are executed in the order you provide.
+4. As a parameter it takes the reducers that will be invoked afterwards
+   `export function logger(reducer: ActionReducer<any>) { }`
