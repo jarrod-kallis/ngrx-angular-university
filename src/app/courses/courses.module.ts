@@ -25,12 +25,19 @@ import { EditCourseDialogComponent } from './edit-course-dialog/edit-course-dial
 import { CoursesCardListComponent } from './courses-card-list/courses-card-list.component';
 import { compareCourses, Course } from './model/course';
 import { compareLessons, Lesson } from './model/lesson';
+import { StoreModule } from '@ngrx/store';
+import { courseReducer } from './reducers';
+import { EffectsModule } from '@ngrx/effects';
+import { CourseEffects } from './course.effects';
+import { CoursesResolverService } from './services/courses-resolver.service';
 
 export const coursesRoutes: Routes = [
   {
     path: '',
-    component: HomeComponent
-
+    component: HomeComponent,
+    resolve: {
+      courses: CoursesResolverService
+    }
   },
   {
     path: ':courseUrl',
@@ -56,7 +63,9 @@ export const coursesRoutes: Routes = [
     MatDatepickerModule,
     MatMomentDateModule,
     ReactiveFormsModule,
-    RouterModule.forChild(coursesRoutes)
+    RouterModule.forChild(coursesRoutes),
+    StoreModule.forFeature('course', courseReducer),
+    EffectsModule.forFeature([CourseEffects])
   ],
   declarations: [
     HomeComponent,
@@ -72,7 +81,8 @@ export const coursesRoutes: Routes = [
   ],
   entryComponents: [EditCourseDialogComponent],
   providers: [
-    CoursesHttpService
+    CoursesHttpService,
+    CoursesResolverService
   ]
 })
 export class CoursesModule {
