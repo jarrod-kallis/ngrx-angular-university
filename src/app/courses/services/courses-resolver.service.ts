@@ -9,10 +9,10 @@ import { areAllCoursesLoaded } from '../course.selectors';
 import CourseActions from '../course.actions-types';
 
 @Injectable()
-export class CoursesResolverService implements Resolve<any> {
+export class CoursesResolverService implements Resolve<boolean> {
   constructor(private store: Store<AppState>) { }
 
-  resolve(): Observable<any> {
+  resolve(): Observable<boolean> {
     console.log('Course Resolver: resolve()');
 
     return this.store.select(areAllCoursesLoaded)
