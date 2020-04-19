@@ -29,7 +29,8 @@ import { CoursesResolverService } from './services/courses-resolver.service';
 import { CoursesEntityService } from './services/courses-entity.service';
 import { CoursesDataService } from './services/courses-data.service';
 
-import { COURSE_ENTITY_NAME } from './course.types';
+import { COURSE_ENTITY_NAME, LESSON_ENTITY_NAME } from './course.types';
+import { LessonsEntityService } from './services/lessons-entity.service';
 
 export const coursesRoutes: Routes = [
   {
@@ -55,6 +56,9 @@ const entityMetadata: EntityMetadataMap = {
       optimisticDelete: true, // This is the default
       optimisticAdd: false // This is the default
     }
+  },
+  [LESSON_ENTITY_NAME]: {
+    sortComparer: compareLessons
   }
 };
 
@@ -95,7 +99,8 @@ const entityMetadata: EntityMetadataMap = {
     CoursesHttpService,
     CoursesResolverService,
     CoursesEntityService,
-    CoursesDataService
+    CoursesDataService,
+    LessonsEntityService
   ]
 })
 export class CoursesModule {
