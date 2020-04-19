@@ -25,11 +25,11 @@ import { EditCourseDialogComponent } from './edit-course-dialog/edit-course-dial
 import { CoursesCardListComponent } from './courses-card-list/courses-card-list.component';
 import { compareCourses, Course } from './model/course';
 import { compareLessons, Lesson } from './model/lesson';
-import { StoreModule } from '@ngrx/store';
-import { courseReducer } from './reducers';
-import { EffectsModule } from '@ngrx/effects';
-import { CourseEffects } from './course.effects';
 import { CoursesResolverService } from './services/courses-resolver.service';
+import { CoursesEntityService } from './services/courses-entity.service';
+import { CoursesDataService } from './services/courses-data.service';
+
+import { COURSE_ENTITY_NAME } from './course.types';
 
 export const coursesRoutes: Routes = [
   {
@@ -39,9 +39,24 @@ export const coursesRoutes: Routes = [
   },
   {
     path: ':courseUrl',
-    component: CourseComponent
+    component: CourseComponent,
+    resolve: [CoursesResolverService]
   }
 ];
+
+const entityMetadata: EntityMetadataMap = {
+  // Entity name
+  [COURSE_ENTITY_NAME]: {
+    // entityName: 'Course', // Not necessary, because it's the same as the map's key
+    sortComparer: compareCourses, // Will alter the ids[] so that the Courses are displayed in the correct order
+    // selectId: (course: Course) => course.id // 'id' is the default field name that NgRx Data will use anyway
+    entityDispatcherOptions: {
+      optimisticUpdate: true, // Update the Redux store immediately on save (Call REST APi in the background)
+      optimisticDelete: true, // This is the default
+      optimisticAdd: false // This is the default
+    }
+  }
+};
 
 @NgModule({
   imports: [
@@ -61,9 +76,7 @@ export const coursesRoutes: Routes = [
     MatDatepickerModule,
     MatMomentDateModule,
     ReactiveFormsModule,
-    RouterModule.forChild(coursesRoutes),
-    StoreModule.forFeature('course', courseReducer),
-    EffectsModule.forFeature([CourseEffects])
+    RouterModule.forChild(coursesRoutes)
   ],
   declarations: [
     HomeComponent,
@@ -80,9 +93,23 @@ export const coursesRoutes: Routes = [
   entryComponents: [EditCourseDialogComponent],
   providers: [
     CoursesHttpService,
-    CoursesResolverService
+    CoursesResolverService,
+    CoursesEntityService,
+    CoursesDataService
   ]
 })
 export class CoursesModule {
-  constructor() { }
+  // Course module is lazy loaded so we need to inject the EntityDefinitionService,
+  // and register the EntityMetadataMap, above, with it.
+  // What this does is associate NgRx Data's Entity Metadata Map with this module's entity map.
+  // Same goes for the data service. It associates NgRx Data's Entity Data Service with our custom one for this module's entities,
+  // so it will no longer use it's default data service to interact with our backend.
+  constructor(
+    entityDefinitionService: EntityDefinitionService,
+    entityDataService: EntityDataService,
+    coursesDataService: CoursesDataService
+  ) {
+    entityDefinitionService.registerMetadataMap(entityMetadata);
+    entityDataService.registerService(COURSE_ENTITY_NAME, coursesDataService);
+  }
 }

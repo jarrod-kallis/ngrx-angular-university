@@ -60,10 +60,14 @@ const routes: Routes = [
     }),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     EffectsModule.forRoot([]),
+    // This allows for UI updates as you time travel through Redux actions
     StoreRouterConnectingModule.forRoot({
       stateKey: 'router', // Redux store key used to store the router state
       routerState: RouterState.Minimal // Serializable version of the router state
-    })
+    }),
+    // NgRx Data - The root app module has no entities directly associated with it.
+    // The entities, ie Course, are associated with their respective feature modules, eg. CoursesModule
+    EntityDataModule.forRoot({})
   ],
   bootstrap: [AppComponent]
 })

@@ -2,13 +2,9 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
 
-// import { CoursesHttpService } from '../services/courses-http.service';
 import { Course } from '../model/course';
-import { AppState } from '../../reducers';
-import CourseActions from '../course.actions-types';
-import { Update } from '@ngrx/entity';
+import { CoursesEntityService } from '../services/courses-entity.service';
 
 @Component({
   selector: 'app-course-dialog',
@@ -27,8 +23,7 @@ export class EditCourseDialogComponent {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<EditCourseDialogComponent>,
     @Inject(MAT_DIALOG_DATA) data,
-    // private coursesService: CoursesHttpService
-    private store: Store<AppState>
+    private coursesEntityService: CoursesEntityService
   ) {
 
     this.dialogTitle = data.dialogTitle;
@@ -64,22 +59,18 @@ export class EditCourseDialogComponent {
       ...this.form.value
     };
 
-    // this.coursesService.saveCourse(course.id, course)
-    //   .subscribe(
-    //     () => this.dialogRef.close()
-    //   );
+    // NgRx Data Pattern
+    if (this.mode === 'update') {
+      // Updates the store and create an HTTP PUT call
+      this.coursesEntityService.update(course);
 
-    const update: Update<Course> = {
-      id: course.id,
-      changes: course
-    };
+      this.dialogRef.close();
+    } else {
+      // console.log('Creating a course');
 
-    this.store.dispatch(
-      CourseActions.courseUpdated({
-        course: update
-      })
-    );
-
-    this.dialogRef.close();
+      // Updates the store and create an HTTP POST call
+      this.coursesEntityService.add(course)
+        .subscribe(() => this.dialogRef.close());
+    }
   }
 }

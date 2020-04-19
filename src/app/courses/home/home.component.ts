@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
+import { map } from 'rxjs/operators';
 
 import { Course } from '../model/course';
 import { defaultDialogConfig } from '../shared/default-dialog-config';
 import { EditCourseDialogComponent } from '../edit-course-dialog/edit-course-dialog.component';
-import { AppState } from '../../reducers';
-import { selectAllBeginnerCourses, selectAllAdvancedCourses, selectPromoTotal } from '../course.selectors';
+import { CoursesEntityService } from '../services/courses-entity.service';
 
 @Component({
   selector: 'app-home',
@@ -22,7 +21,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private store: Store<AppState>
+    private coursesEntityService: CoursesEntityService
   ) {
     console.log('Courses Home Component created');
   }
@@ -33,9 +32,20 @@ export class HomeComponent implements OnInit {
   }
 
   reload() {
-    this.beginnerCourses$ = this.store.select(selectAllBeginnerCourses);
-    this.advancedCourses$ = this.store.select(selectAllAdvancedCourses);
-    this.promoTotal$ = this.store.select(selectPromoTotal);
+    this.beginnerCourses$ = this.coursesEntityService.entities$
+      .pipe(
+        map(courses => courses.filter(course => course.category === 'BEGINNER'))
+      );
+
+    this.advancedCourses$ = this.coursesEntityService.entities$
+      .pipe(
+        map(courses => courses.filter(course => course.category === 'ADVANCED'))
+      );
+
+    this.promoTotal$ = this.coursesEntityService.entities$
+      .pipe(
+        map(courses => courses.filter(course => course.promo).length)
+      );
   }
 
   onAddCourse() {
